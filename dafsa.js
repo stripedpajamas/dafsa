@@ -51,10 +51,10 @@ function commonPrefix (root, word) {
 
 function replaceOrRegister (node, register) {
   const child = node.lastChild
-  if (child.children.size) replaceOrRegister(child, register)
+  if (child && child.children.size) replaceOrRegister(child, register)
   if (isEqual(node, register.get(node.key))) {
     node.lastChild = register.get(node.key)
-    node.children.set(lastChild.key, node.lastChild)
+    node.children.set(node.lastChild.key, node.lastChild)
   } else {
     register.set(node.key, node)
   }
@@ -62,12 +62,13 @@ function replaceOrRegister (node, register) {
 
 // the logical equality of nodes
 function isEqual (a, b) {
-  if (!(a & b)) return false
+  if (a === b) return false // no need to "replace" the node if they are _actually_ the same
+  if (!(a && b)) return false
   const sameFinality = !(a.isWordEnd ^ b.isWordEnd)
   const sameChildrenSize = !(a.children.size ^ b.children.size)
   let sameChildrenKeys = true
   a.children.forEach((node, key) => {
-    sameChildrenKeys = b.children.has(b) & isEqual(node, b.children.get(b))
+    sameChildrenKeys = b.children.has(key) & isEqual(node, b.children.get(key))
   })
   return sameFinality & sameChildrenSize & sameChildrenKeys
 }

@@ -1,11 +1,5 @@
 const DAFSA = require('./dafsa')
-
-const words = [ 'happy', 'health', 'healthy', 'hear', 'heart', 'help' ]
-
-const dafsa = new DAFSA()
-dafsa.addSortedWords(words)
-
-console.log(words, dafsa)
+const Trie = require('./trie')
 
 function print (node, letter, tabs = '') {
   const size = node.children.size
@@ -25,11 +19,24 @@ function getNodeCount (root) {
   return seen.size
 }
 
+/**************************************************************/
+
+const words = [ 'happy', 'health' , 'healthy', 'mirthy'] // 'hear', 'heart', 'help' ]
+
+const dafsa = new DAFSA()
+const trie = new Trie()
+words.forEach((word) => trie.addWord(word))
+
+dafsa.addSortedWords(words)
+
+// console.log(words, dafsa)
+
 print(dafsa.root, 'ROOT')
 console.log(
-  '%d words, %d letters, %d unique letters; we have %d letter nodes',
+  '%d words, %d letters, %d unique letters; we have %d letter nodes; trie has %d nodes',
   words.length,
   words.join('').split('').length,
   words.join('').split('').reduce((t, l) => { t.add(l); return t }, new Set()).size,
-  getNodeCount(dafsa.root)
+  getNodeCount(dafsa.root),
+  getNodeCount(trie.root)
 )
