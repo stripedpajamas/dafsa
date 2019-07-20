@@ -1,10 +1,11 @@
 const DAFSA = require('./dafsa')
 
-const words = ['help', 'hear', 'heart', 'health', 'healthy', 'happy']
+const words = [ 'happy', 'health', 'healthy', 'hear', 'heart', 'help' ]
 
 const dafsa = new DAFSA()
+dafsa.addSortedWords(words)
 
-words.forEach((word) => dafsa.add(word))
+console.log(words, dafsa)
 
 function print (node, letter, tabs = '') {
   const size = node.children.size
@@ -14,18 +15,21 @@ function print (node, letter, tabs = '') {
   node.children.forEach((v, k) => print(v, k, tabs + '\t'))
 }
 
-function getLetterNodeCount (lettersMap) {
-  let sum = 0
-  for (let v of lettersMap.values()) {
-    sum += v.length
+function getNodeCount (root) {
+  const seen = new Set()
+  function visit (node, fn) {
+    fn(node)
+    node.children.forEach(child => visit(child, fn))
   }
-  return sum
+  visit(root, (node) => { seen.add(node) })
+  return seen.size
 }
 
 print(dafsa.root, 'ROOT')
 console.log(
-  '%d words, %d unique letters; we have %d letter nodes',
+  '%d words, %d letters, %d unique letters; we have %d letter nodes',
   words.length,
+  words.join('').split('').length,
   words.join('').split('').reduce((t, l) => { t.add(l); return t }, new Set()).size,
-  getLetterNodeCount(dafsa.letters)
+  getNodeCount(dafsa.root)
 )
