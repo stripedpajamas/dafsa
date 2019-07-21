@@ -22,7 +22,7 @@ function getNodeCount (root) {
 
 /**************************************************************/
 
-const wordsFile = fs.readFileSync('./words.txt', 'utf8')
+const wordsFile = fs.readFileSync('./sortedWords.txt', 'utf8')
 const words = wordsFile.split('\n')
 
 const dafsa = new DAFSA()
