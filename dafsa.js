@@ -1,18 +1,21 @@
 function Node (key, isWordEnd) {
   this.key = key
   this.children = new Map()
+  this.parents = new Set()
   this.lastChild = null
   this.isWordEnd = isWordEnd
 }
 
 Node.prototype.addChild = function (key) {
-  this.children.set(key, new Node(key, false))
+  const node = new Node(key, false)
+  this.children.set(key, node)
+  node.parents.add(this)
   this.lastChild = this.children.get(key)
 }
 
 function DAFSA () {
   this.root = new Node()
-  this.register = new Map()
+  this.register = new Map() // key -> node[]
 }
 
 /*
@@ -52,11 +55,18 @@ function commonPrefix (root, word) {
 function replaceOrRegister (node, register) {
   const child = node.lastChild
   if (child && child.children.size) replaceOrRegister(child, register)
-  if (isEqual(node, register.get(node.key))) {
-    node.lastChild = register.get(node.key)
-    node.children.set(node.lastChild.key, node.lastChild)
-  } else {
-    register.set(node.key, node)
+  let possibilities = register.get(node.key) || []
+  if (!possibilities.length) register.set(node.key, possibilities.concat(node))
+  for (let possibility of possibilities) {
+    if (isEqual(node, possibility)) {
+      node.parents.forEach((parent) => {
+        parent.children.set(node.key, possibility)
+        possibility.parents.add(parent)
+      })
+    } else {
+      register.set(node.key, possibilities.concat(node))
+      break
+    }
   }
 }
 

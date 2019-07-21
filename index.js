@@ -1,3 +1,4 @@
+const fs = require('fs')
 const DAFSA = require('./dafsa')
 const Trie = require('./trie')
 
@@ -21,15 +22,14 @@ function getNodeCount (root) {
 
 /**************************************************************/
 
-const words = [ 'happy', 'health' , 'healthy', 'mirthy'] // 'hear', 'heart', 'help' ]
+const wordsFile = fs.readFileSync('./words.txt', 'utf8')
+const words = wordsFile.split('\n')
 
 const dafsa = new DAFSA()
 const trie = new Trie()
 words.forEach((word) => trie.addWord(word))
 
 dafsa.addSortedWords(words)
-
-// console.log(words, dafsa)
 
 print(dafsa.root, 'ROOT')
 console.log(
