@@ -31,12 +31,15 @@ words.forEach((word) => trie.addWord(word))
 
 dafsa.addSortedWords(words)
 
-print(dafsa.root, 'ROOT')
-console.log(
-  '%d words, %d letters, %d unique letters; we have %d letter nodes; trie has %d nodes',
-  words.length,
-  words.join('').split('').length,
-  words.join('').split('').reduce((t, l) => { t.add(l); return t }, new Set()).size,
-  getNodeCount(dafsa.root),
-  getNodeCount(trie.root)
-)
+console.log('These words are not words:', words.filter(word => !dafsa.isWord(word)))
+console.log('All words are words?', words.every(word => dafsa.isWord(word)))
+
+// print(dafsa.root, 'ROOT')
+// console.log(
+//   '%d words, %d letters, %d unique letters; we have %d letter nodes; trie has %d nodes',
+//   words.length,
+//   words.join('').split('').length,
+//   words.join('').split('').reduce((t, l) => { t.add(l); return t }, new Set()).size,
+//   getNodeCount(dafsa.root),
+//   getNodeCount(trie.root)
+// )

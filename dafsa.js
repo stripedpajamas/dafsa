@@ -23,33 +23,37 @@ Working with Algorithm 1 from https://www.aclweb.org/anthology/J00-1002
 */
 DAFSA.prototype.addSortedWords = function (words) {
   words.forEach((word) => {
-    const { lastState, prefix } = commonPrefix(this.root, word)
-    const currentSuffix = word.slice(prefix.length)
-    if (lastState.children.size) replaceOrRegister(lastState, this.register)
-    addSuffix(lastState, currentSuffix)
+    let node = this.root
+    for (let i = 0; i < word.length; i++) {
+      let c = word[i]
+      if (!node.children.has(c)) {
+        if (node.children.size) replaceOrRegister(node, this.register)
+        addSuffix(node, word, i)
+        break
+      }
+      node = node.children.get(c)
+    }
   })
   replaceOrRegister(this.root, this.register)
 }
 
-function addSuffix (root, suffix) {
+DAFSA.prototype.isWord = function (word) {
+  let node = this.root
+  for (let c of word) {
+    if (!node.children.has(c)) return false
+    node = node.children.get(c)
+  }
+  return node.isWordEnd
+}
+
+function addSuffix (root, word, suffixStart) {
   let node = root
-  for (let c of suffix) {
+  for (let i = suffixStart; i < word.length; i++) {
+    let c = word[i]
     node.addChild(c)
     node = node.children.get(c)
   }
   node.isWordEnd = true
-}
-
-// the longest prefix w of Word such that
-function commonPrefix (root, word) {
-  let node = root
-  let prefix = []
-  for (let c of word) {
-    if (!node.children.has(c)) break
-    prefix.push(c)
-    node = node.children.get(c)
-  }
-  return { lastState: node, prefix: prefix.join('') }
 }
 
 function replaceOrRegister (node, register) {
